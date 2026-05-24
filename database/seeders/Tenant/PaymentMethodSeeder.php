@@ -1,0 +1,198 @@
+<?php
+
+namespace Database\Seeders\Tenant;
+
+use App\Models\PaymentMethod;
+use Illuminate\Database\Seeder;
+
+class PaymentMethodSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        PaymentMethod::insert([
+            [
+                "payment_method" => "Oxxo Pay",
+                "abbreviation" => "OX",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Tarjeta de Credito",
+                "abbreviation" => "TC",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "PayPal",
+                "abbreviation" => "PP",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Efectivo",
+                "abbreviation" => "EF",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Terminal",
+                "abbreviation" => "TE",
+                "commision" => 0.050,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Cortesia",
+                "abbreviation" => "CO",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Boleto Duro",
+                "abbreviation" => "BD",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "ScotiaBank",
+                "abbreviation" => "SC",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Bloqueo",
+                "abbreviation" => "BL",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Scotia Error",
+                "abbreviation" => "SE",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "3D SECURE",
+                "abbreviation" => "3D",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 1,
+            ],
+            [
+                "payment_method" => "Gobierno",
+                "abbreviation" => "GB",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Transferencia SPEI",
+                "abbreviation" => "SP",
+                "commision" => 0.000,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Conekta Card",
+                "abbreviation" => "CC",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Consignación",
+                "abbreviation" => "CN",
+                "commision" => 0.000,
+                "online_service_cost" => 0.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Oxxo Femsa",
+                "abbreviation" => "OF",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Pagando",
+                "abbreviation" => "PG",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0.051,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Dinero en banco",
+                "abbreviation" => "DB",
+                "commision" => 0,
+                "online_service_cost" => 0,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Conekta efectivo",
+                "abbreviation" => "CE",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+            [
+                "payment_method" => "Apartado",
+                "abbreviation" => "AP",
+                "commision" => 0.050,
+                "online_service_cost" => 20.00,
+                "monthly_installments_commission" => 0,
+                "active" => 1,
+                "visible_on_web" => 0,
+            ],
+        ]);
+    }
+}
