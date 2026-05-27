@@ -44,6 +44,11 @@ trait HasImage
         ]);
     }
 
+    public function deleteMainImage(): void
+    {
+        $this->mainImage()->first()?->delete();
+    }
+
     protected function imageStorageDirectory(): string
     {
         $segment = Str::plural(Str::snake(class_basename($this)));

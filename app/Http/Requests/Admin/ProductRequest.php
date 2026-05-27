@@ -25,6 +25,7 @@ class ProductRequest extends FormRequest
                 Rule::unique('products', 'sku')->ignore($productId),
             ],
             'image' => ['nullable', 'image', 'max:5120'],
+            'remove_image' => ['sometimes', 'boolean'],
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'details' => ['nullable', 'string'],

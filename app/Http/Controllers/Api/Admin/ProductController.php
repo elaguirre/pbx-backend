@@ -34,7 +34,7 @@ class ProductController extends Controller
     #[Route('POST', '/', middleware: 'can:products.add')]
     public function store(ProductRequest $request): JsonResponse
     {
-        $product = Product::query()->create($request->safe()->except('image'));
+        $product = Product::query()->create($request->safe()->except(['image', 'remove_image']));
 
         if ($request->hasFile('image')) {
             $product->storeMainImage($request->file('image'));
@@ -48,7 +48,11 @@ class ProductController extends Controller
     #[Route('PUT', '/{product}', middleware: 'can:products.edit')]
     public function update(ProductRequest $request, Product $product): JsonResponse
     {
-        $product->update($request->safe()->except('image'));
+        $product->update($request->safe()->except(['image', 'remove_image']));
+
+        if ($request->boolean('remove_image')) {
+            $product->deleteMainImage();
+        }
 
         if ($request->hasFile('image')) {
             $product->storeMainImage($request->file('image'));

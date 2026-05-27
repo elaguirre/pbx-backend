@@ -17,6 +17,7 @@ class EntityRequest extends FormRequest
     {
         return [
             'image' => ['nullable', 'image', 'max:5120'],
+            'remove_image' => ['sometimes', 'boolean'],
             'name' => ['required', 'string', 'max:150'],
             'rfc' => ['nullable', 'string', 'max:50'],
             'type' => ['required', Rule::enum(EntityType::class)],

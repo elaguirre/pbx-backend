@@ -79,6 +79,8 @@ class OrderController extends Controller
             throw new ControlledException('El pedido debe tener al menos un concepto.', 422);
         }
 
+        $this->orderCheckout->assertAllConceptProductsHavePieces($order);
+
         DB::transaction(function () use ($order) {
             $this->orderCheckout->generateOrderPieces($order);
             $order->update(['status' => OrderStatus::InProgress]);
@@ -92,7 +94,14 @@ class OrderController extends Controller
     #[Route('PUT', '/{order}', middleware: 'can:orders.edit')]
     public function update(OrderRequest $request, Order $order): JsonResponse
     {
-        $order->update($request->validated());
+        $data = $request->validated();
+        $status = $data['status'] ?? $order->status;
+
+        if ($status !== OrderStatus::Canceled) {
+            $data['cancellation_reason'] = null;
+        }
+
+        $order->update($data);
 
         return response()->message('Pedido actualizado correctamente.', data: $order);
     }

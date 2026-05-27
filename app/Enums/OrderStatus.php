@@ -10,6 +10,7 @@ enum OrderStatus: int
     case Sent = 3;
     case Delivered = 4;
     case Paid = 5;
+    case Canceled = 6;
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum OrderStatus: int
             self::Sent => 'Enviado',
             self::Delivered => 'Entregado',
             self::Paid => 'Pagado',
+            self::Canceled => 'Cancelado',
         };
     }
 }

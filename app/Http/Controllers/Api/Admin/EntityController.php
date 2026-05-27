@@ -29,7 +29,7 @@ class EntityController extends Controller
     #[Route('POST', '/', middleware: 'can:entities.add')]
     public function store(EntityRequest $request): JsonResponse
     {
-        $entity = Entity::query()->create($request->safe()->except('image'));
+        $entity = Entity::query()->create($request->safe()->except(['image', 'remove_image']));
 
         if ($request->hasFile('image')) {
             $entity->storeMainImage($request->file('image'));
@@ -43,7 +43,11 @@ class EntityController extends Controller
     #[Route('PUT', '/{entity}', middleware: 'can:entities.edit')]
     public function update(EntityRequest $request, Entity $entity): JsonResponse
     {
-        $entity->update($request->safe()->except('image'));
+        $entity->update($request->safe()->except(['image', 'remove_image']));
+
+        if ($request->boolean('remove_image')) {
+            $entity->deleteMainImage();
+        }
 
         if ($request->hasFile('image')) {
             $entity->storeMainImage($request->file('image'));

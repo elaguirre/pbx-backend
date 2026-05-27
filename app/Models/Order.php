@@ -37,6 +37,7 @@ class Order extends Model
         'delivery_address_id',
         'user_id',
         'status',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
