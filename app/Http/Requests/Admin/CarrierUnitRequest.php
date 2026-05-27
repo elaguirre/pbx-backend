@@ -18,6 +18,8 @@ class CarrierUnitRequest extends FormRequest
             'description' => ['required', 'string'],
             'load_volume_capacity' => ['required', 'numeric', 'min:0.0001'],
             'load_weight_capacity' => ['required', 'numeric', 'min:0.0001'],
+            'price_by_volume' => ['nullable', 'numeric', 'min:0'],
+            'price_by_weight' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 
@@ -30,6 +32,8 @@ class CarrierUnitRequest extends FormRequest
             'load_volume_capacity.min' => 'La capacidad volumétrica debe ser mayor a cero.',
             'load_weight_capacity.required' => 'La capacidad de peso es obligatoria.',
             'load_weight_capacity.min' => 'La capacidad de peso debe ser mayor a cero.',
+            'price_by_volume.min' => 'El precio por volumen no puede ser negativo.',
+            'price_by_weight.min' => 'El precio por peso no puede ser negativo.',
         ];
     }
 }

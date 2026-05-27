@@ -15,7 +15,7 @@ class Client extends Model
 
     protected $default_sorts = ['-id'];
     protected $allowed_sorts = ['id', 'term_in_days', 'created_at'];
-    protected $allowed_includes = ['entity', 'entity.contactData'];
+    protected $allowed_includes = ['entity', 'entity.images', 'entity.contactData'];
 
     protected $fillable = [
         'entity_id',

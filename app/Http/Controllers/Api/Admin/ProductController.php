@@ -34,7 +34,13 @@ class ProductController extends Controller
     #[Route('POST', '/', middleware: 'can:products.add')]
     public function store(ProductRequest $request): JsonResponse
     {
-        $product = Product::query()->create($request->validated());
+        $product = Product::query()->create($request->safe()->except('image'));
+
+        if ($request->hasFile('image')) {
+            $product->storeMainImage($request->file('image'));
+        }
+
+        $product->load('images');
 
         return response()->message('Producto creado correctamente.', 201, data: $product);
     }
@@ -42,7 +48,13 @@ class ProductController extends Controller
     #[Route('PUT', '/{product}', middleware: 'can:products.edit')]
     public function update(ProductRequest $request, Product $product): JsonResponse
     {
-        $product->update($request->validated());
+        $product->update($request->safe()->except('image'));
+
+        if ($request->hasFile('image')) {
+            $product->storeMainImage($request->file('image'));
+        }
+
+        $product->load('images');
 
         return response()->message('Producto actualizado correctamente.', data: $product);
     }

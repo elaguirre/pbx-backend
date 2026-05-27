@@ -18,6 +18,8 @@ class CarrierUnit extends Model
         'id',
         'load_volume_capacity',
         'load_weight_capacity',
+        'price_by_volume',
+        'price_by_weight',
         'created_at',
     ];
     protected $allowed_includes = ['carrier', 'carrier.entity'];
@@ -27,6 +29,8 @@ class CarrierUnit extends Model
         'description',
         'load_volume_capacity',
         'load_weight_capacity',
+        'price_by_volume',
+        'price_by_weight',
     ];
 
     protected function casts(): array
@@ -34,6 +38,8 @@ class CarrierUnit extends Model
         return [
             'load_volume_capacity' => 'decimal:4',
             'load_weight_capacity' => 'decimal:4',
+            'price_by_volume' => 'decimal:4',
+            'price_by_weight' => 'decimal:4',
         ];
     }
 

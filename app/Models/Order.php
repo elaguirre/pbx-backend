@@ -19,9 +19,11 @@ class Order extends Model
     protected $allowed_includes = [
         'client',
         'client.entity',
+        'client.entity.images',
         'user',
         'concepts',
         'concepts.product',
+        'concepts.product.images',
         'orderPieces',
         'orderPieces.piece',
         'orderPieces.orderConcept',

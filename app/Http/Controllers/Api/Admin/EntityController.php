@@ -29,7 +29,13 @@ class EntityController extends Controller
     #[Route('POST', '/', middleware: 'can:entities.add')]
     public function store(EntityRequest $request): JsonResponse
     {
-        $entity = Entity::query()->create($request->validated());
+        $entity = Entity::query()->create($request->safe()->except('image'));
+
+        if ($request->hasFile('image')) {
+            $entity->storeMainImage($request->file('image'));
+        }
+
+        $entity->load('images');
 
         return response()->message('Entidad creada correctamente.', 201, data: $entity);
     }
@@ -37,7 +43,13 @@ class EntityController extends Controller
     #[Route('PUT', '/{entity}', middleware: 'can:entities.edit')]
     public function update(EntityRequest $request, Entity $entity): JsonResponse
     {
-        $entity->update($request->validated());
+        $entity->update($request->safe()->except('image'));
+
+        if ($request->hasFile('image')) {
+            $entity->storeMainImage($request->file('image'));
+        }
+
+        $entity->load('images');
 
         return response()->message('Entidad actualizada correctamente.', data: $entity);
     }

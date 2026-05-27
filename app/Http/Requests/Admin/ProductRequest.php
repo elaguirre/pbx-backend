@@ -24,7 +24,7 @@ class ProductRequest extends FormRequest
                 'max:255',
                 Rule::unique('products', 'sku')->ignore($productId),
             ],
-            'image' => ['nullable', 'string', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:5120'],
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'details' => ['nullable', 'string'],
@@ -39,7 +39,8 @@ class ProductRequest extends FormRequest
             'name.required' => 'El nombre es obligatorio.',
             'price.required' => 'El precio es obligatorio.',
             'price.min' => 'El precio no puede ser negativo.',
-            'image.max' => 'La URL de imagen es demasiado larga.',
+            'image.image' => 'El archivo debe ser una imagen válida.',
+            'image.max' => 'La imagen no puede superar 5 MB.',
         ];
     }
 }

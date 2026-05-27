@@ -109,6 +109,10 @@ class ManufacturerOrderPiece extends Model
             });
         }
 
+        if (request()->filled('order_piece_id')) {
+            $query->where('manufacturer_order_pieces.order_piece_id', request('order_piece_id'));
+        }
+
         return $query;
     }
 }

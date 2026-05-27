@@ -14,12 +14,22 @@ class Piece extends Model
     use HasQueryBuilder;
 
     protected $default_sorts = ['-id'];
-    protected $allowed_sorts = ['id', 'name', 'created_at'];
+    protected $allowed_sorts = ['id', 'name', 'volume', 'weight', 'created_at'];
     protected $allowed_includes = ['products', 'pieceMaterials', 'pieceMaterials.material'];
 
     protected $fillable = [
         'name',
+        'volume',
+        'weight',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'volume' => 'decimal:4',
+            'weight' => 'decimal:4',
+        ];
+    }
 
     public function products(): BelongsToMany
     {

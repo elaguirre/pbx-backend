@@ -14,6 +14,7 @@ use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
+use Stancl\Tenancy\Controllers\TenantAssetsController;
 use Stancl\Tenancy\Middleware;
 
 class TenancyServiceProvider extends ServiceProvider
@@ -124,6 +125,8 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        TenantAssetsController::$tenancyMiddleware = Middleware\InitializeTenancyByRequestData::class;
+
         $this->bootEvents();
         $this->mapRoutes();
 

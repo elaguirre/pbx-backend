@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasImage;
 use App\Models\Traits\HasQueryBuilder;
 use App\Models\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Product extends Model
 {
     use HasFactory;
+    use HasImage;
     use HasQueryBuilder;
     use HasSlug;
 
@@ -20,12 +22,11 @@ class Product extends Model
 
     protected $default_sorts = ['-id'];
     protected $allowed_sorts = ['id', 'sku', 'slug', 'name', 'price', 'created_at'];
-    protected $allowed_includes = ['productPieces', 'productPieces.piece', 'pieces'];
+    protected $allowed_includes = ['images', 'productPieces', 'productPieces.piece', 'pieces'];
 
     protected $fillable = [
         'sku',
         'slug',
-        'image',
         'name',
         'price',
         'details',

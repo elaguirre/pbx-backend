@@ -19,6 +19,8 @@ class OrderPiece extends Model
     protected $allowed_sorts = ['id', 'quantity', 'created_at'];
     protected $allowed_includes = [
         'order',
+        'order.client',
+        'order.client.entity',
         'orderConcept',
         'orderConcept.product',
         'piece',

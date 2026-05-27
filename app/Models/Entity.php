@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\EntityType;
+use App\Models\Traits\HasImage;
 use App\Models\Traits\HasQueryBuilder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,14 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Entity extends Model
 {
     use HasFactory;
+    use HasImage;
     use HasQueryBuilder;
 
     protected $default_sorts = ['-id'];
     protected $allowed_sorts = ['id', 'name', 'rfc', 'type', 'created_at'];
-    protected $allowed_includes = ['contactData', 'client', 'addresses', 'addresses.city', 'addresses.city.state'];
+    protected $allowed_includes = ['images', 'contactData', 'client', 'addresses', 'addresses.city', 'addresses.city.state'];
 
     protected $fillable = [
-        'image',
         'name',
         'rfc',
         'type',

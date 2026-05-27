@@ -15,6 +15,8 @@ class PieceRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'volume' => ['nullable', 'numeric', 'min:0'],
+            'weight' => ['nullable', 'numeric', 'min:0'],
         ];
     }
 
@@ -22,6 +24,8 @@ class PieceRequest extends FormRequest
     {
         return [
             'name.required' => 'El nombre es obligatorio.',
+            'volume.min' => 'El volumen no puede ser negativo.',
+            'weight.min' => 'El peso no puede ser negativo.',
         ];
     }
 }
