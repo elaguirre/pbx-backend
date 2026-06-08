@@ -19,6 +19,7 @@ use Database\Seeders\Tenant\Permissions\OrderConceptPermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\OrderPiecePermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\OrderPieceStatusPermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\OrderPermissionsSeeder;
+use Database\Seeders\Tenant\Permissions\ProductionBatchPermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\ProductionOrderPermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\ManufacturerPieceCostPermissionsSeeder;
 use Database\Seeders\Tenant\Permissions\ManufacturerOrderPiecePermissionsSeeder;
@@ -58,6 +59,7 @@ class BouncerAbilitiesSeeder extends Seeder
             OrderConceptPermissionsSeeder::class,
             OrderPiecePermissionsSeeder::class,
             OrderPieceStatusPermissionsSeeder::class,
+            ProductionBatchPermissionsSeeder::class,
             ProductionOrderPermissionsSeeder::class,
             ManufacturerPieceCostPermissionsSeeder::class,
             ManufacturerOrderPiecePermissionsSeeder::class,

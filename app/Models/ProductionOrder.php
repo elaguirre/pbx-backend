@@ -18,6 +18,7 @@ class ProductionOrder extends Model
     protected $allowed_includes = [
         'manufacturer',
         'manufacturer.entity',
+        'productionBatch',
         'manufacturerOrderPieces',
         'manufacturerOrderPieces.orderPiece',
         'manufacturerOrderPieces.orderPiece.piece',
@@ -25,11 +26,17 @@ class ProductionOrder extends Model
 
     protected $fillable = [
         'manufacturer_id',
+        'production_batch_id',
     ];
 
     public function manufacturer(): BelongsTo
     {
         return $this->belongsTo(Manufacturer::class);
+    }
+
+    public function productionBatch(): BelongsTo
+    {
+        return $this->belongsTo(ProductionBatch::class);
     }
 
     public function manufacturerOrderPieces(): HasMany
@@ -58,6 +65,10 @@ class ProductionOrder extends Model
     {
         if (request()->filled('manufacturer_id')) {
             $query->where('production_orders.manufacturer_id', request('manufacturer_id'));
+        }
+
+        if (request()->filled('production_batch_id')) {
+            $query->where('production_orders.production_batch_id', request('production_batch_id'));
         }
 
         return $query;

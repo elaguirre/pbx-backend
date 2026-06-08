@@ -15,6 +15,7 @@ class ProductionOrderRequest extends FormRequest
     {
         return [
             'manufacturer_id' => ['required', 'integer', 'exists:manufacturers,id'],
+            'production_batch_id' => ['nullable', 'integer', 'exists:production_batches,id'],
         ];
     }
 
@@ -22,6 +23,7 @@ class ProductionOrderRequest extends FormRequest
     {
         return [
             'manufacturer_id.required' => 'El maquilador es obligatorio.',
+            'production_batch_id.exists' => 'El lote de producción no existe.',
         ];
     }
 }
