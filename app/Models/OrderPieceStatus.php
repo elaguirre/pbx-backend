@@ -101,4 +101,27 @@ class OrderPieceStatus extends Model
     {
         return static::idsForRole(OrderPieceStatusRole::Shippable);
     }
+
+    public static function packableStatusIds(): array
+    {
+        return static::idsForRole(OrderPieceStatusRole::Packable);
+    }
+
+    /** Estados con orden >= al estado con rol empaquetable (incluye embarcable). */
+    public static function packableOrBeyondStatusIds(): array
+    {
+        $packableOrder = static::query()
+            ->where('role', OrderPieceStatusRole::Packable)
+            ->value('order');
+
+        if ($packableOrder === null) {
+            return [];
+        }
+
+        return static::query()
+            ->where('order', '>=', $packableOrder)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductionBatchRequest;
 use App\Models\ProductionBatch;
+use App\Services\ManufacturerLaborCostCalculator;
 use Illuminate\Http\JsonResponse;
 use Spatie\RouteAttributes\Attributes\{Middleware, Prefix, Route};
 
@@ -12,18 +13,27 @@ use Spatie\RouteAttributes\Attributes\{Middleware, Prefix, Route};
 #[Prefix('admin/production-batches')]
 class ProductionBatchController extends Controller
 {
+    public function __construct(protected ManufacturerLaborCostCalculator $laborCosts) {}
+
     #[Route('GET', '/', middleware: 'can:production_batches.view')]
     public function index(): JsonResponse
     {
-        return response()->json(ProductionBatch::queryBuilder()->resolve());
+        $resolved = ProductionBatch::queryBuilder()->resolve();
+
+        return response()->json($this->appendProductionBatchListMetrics($resolved));
     }
 
     #[Route('GET', '/{production_batch}', middleware: 'can:production_batches.view')]
     public function show(ProductionBatch $production_batch): JsonResponse
     {
-        return response()->json(
-            ProductionBatch::queryBuilder()->whereKey($production_batch->getKey())->firstOrFail(),
-        );
+        $batch = ProductionBatch::queryBuilder()->whereKey($production_batch->getKey())->firstOrFail();
+
+        return response()->json($this->appendProductionBatchListMetrics($batch));
+    }
+
+    private function appendProductionBatchListMetrics(mixed $resolved): mixed
+    {
+        return $this->laborCosts->appendProductionBatchCompletionProgress($resolved);
     }
 
     #[Route('POST', '/', middleware: 'can:production_batches.add')]

@@ -25,7 +25,7 @@ class OrderPieceStatusSeeder extends Seeder
             [
                 'name' => 'Lista para acabado',
                 'details' => 'Manufactura terminada; disponible para pintura u otro acabado.',
-                'role' => null,
+                'role' => 'packable',
                 'order' => 30,
             ],
             [

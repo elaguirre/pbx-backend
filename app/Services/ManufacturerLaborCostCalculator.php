@@ -7,6 +7,7 @@ use App\Models\ManufacturingFollowUp;
 use App\Models\ManufacturerOrderPiece;
 use App\Models\ManufacturerPieceCost;
 use App\Models\OrderPiece;
+use App\Models\OrderPieceStatus;
 use App\Models\ProductionOrder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
@@ -154,30 +155,14 @@ class ManufacturerLaborCostCalculator
         }
 
         $orderIds = $orders->pluck('id')->all();
-        $totalQtyByOrderId = array_fill_keys($orderIds, 0.0);
-        $completedQtyByOrderId = array_fill_keys($orderIds, 0.0);
-
         $assignments = ManufacturerOrderPiece::query()
             ->whereIn('production_order_id', $orderIds)
             ->get(['id', 'production_order_id', 'quantity']);
 
-        $finishedByAssignmentId = ManufacturingFollowUp::query()
-            ->whereIn('manufacturer_order_piece_id', $assignments->pluck('id')->all())
-            ->where('result', ManufacturingFollowUpResult::CompletedPieces)
-            ->groupBy('manufacturer_order_piece_id')
-            ->selectRaw('manufacturer_order_piece_id, SUM(quantity) as total')
-            ->pluck('total', 'manufacturer_order_piece_id')
-            ->map(fn ($total) => (float) $total)
-            ->all();
-
-        foreach ($assignments as $assignment) {
-            $orderId = $assignment->production_order_id;
-            $assigned = (float) $assignment->quantity;
-            $finished = (float) ($finishedByAssignmentId[$assignment->getKey()] ?? 0);
-
-            $totalQtyByOrderId[$orderId] += $assigned;
-            $completedQtyByOrderId[$orderId] += min($finished, $assigned);
-        }
+        [$totalQtyByOrderId, $completedQtyByOrderId] = $this->completionTotalsFromFollowUp(
+            $assignments,
+            fn (ManufacturerOrderPiece $assignment) => $assignment->production_order_id,
+        );
 
         return $this->mapResolved($resolved, function (Model $order) use ($totalQtyByOrderId, $completedQtyByOrderId) {
             $orderId = $order->getKey();
@@ -190,6 +175,133 @@ class ManufacturerLaborCostCalculator
 
             return $order;
         });
+    }
+
+    public function appendProductionBatchCompletionProgress(mixed $resolved): mixed
+    {
+        $batches = $this->collectModels($resolved);
+
+        if ($batches->isEmpty()) {
+            return $resolved;
+        }
+
+        $batchIds = $batches->pluck('id')->all();
+        $assignments = ManufacturerOrderPiece::query()
+            ->join(
+                'production_orders',
+                'production_orders.id',
+                '=',
+                'manufacturer_order_pieces.production_order_id',
+            )
+            ->whereIn('production_orders.production_batch_id', $batchIds)
+            ->get([
+                'manufacturer_order_pieces.id',
+                'manufacturer_order_pieces.order_piece_id',
+                'manufacturer_order_pieces.quantity',
+                'production_orders.production_batch_id',
+            ]);
+
+        [$totalQtyByBatchId, $completedQtyByBatchId] = $this->completionTotalsFromPackableStatus(
+            $assignments,
+            fn (ManufacturerOrderPiece $assignment) => $assignment->production_batch_id,
+        );
+
+        return $this->mapResolved($resolved, function (Model $batch) use ($totalQtyByBatchId, $completedQtyByBatchId) {
+            $batchId = $batch->getKey();
+            $progress = $this->completionProgressAttributes(
+                (float) ($totalQtyByBatchId[$batchId] ?? 0),
+                (float) ($completedQtyByBatchId[$batchId] ?? 0),
+            );
+
+            $batch->setAttribute('completion_progress', $progress);
+
+            return $batch;
+        });
+    }
+
+    /**
+     * Avance de orden de producción: piezas terminadas en seguimiento de manufactura.
+     *
+     * @param  Collection<int, ManufacturerOrderPiece>  $assignments
+     * @return array{array<int|string, float>, array<int|string, float>}
+     */
+    protected function completionTotalsFromFollowUp(Collection $assignments, callable $groupKeyResolver): array
+    {
+        $totalQtyByGroup = [];
+        $completedQtyByGroup = [];
+
+        if ($assignments->isEmpty()) {
+            return [$totalQtyByGroup, $completedQtyByGroup];
+        }
+
+        $finishedByAssignmentId = ManufacturingFollowUp::query()
+            ->whereIn('manufacturer_order_piece_id', $assignments->pluck('id')->all())
+            ->where('result', ManufacturingFollowUpResult::CompletedPieces)
+            ->groupBy('manufacturer_order_piece_id')
+            ->selectRaw('manufacturer_order_piece_id, SUM(quantity) as total')
+            ->pluck('total', 'manufacturer_order_piece_id')
+            ->map(fn ($total) => (float) $total)
+            ->all();
+
+        foreach ($assignments as $assignment) {
+            $groupId = $groupKeyResolver($assignment);
+
+            if ($groupId === null) {
+                continue;
+            }
+
+            $assigned = (float) $assignment->quantity;
+            $finished = (float) ($finishedByAssignmentId[$assignment->getKey()] ?? 0);
+
+            $totalQtyByGroup[$groupId] = ($totalQtyByGroup[$groupId] ?? 0) + $assigned;
+            $completedQtyByGroup[$groupId] = ($completedQtyByGroup[$groupId] ?? 0) + min($finished, $assigned);
+        }
+
+        return [$totalQtyByGroup, $completedQtyByGroup];
+    }
+
+    /**
+     * Avance de lote de producción: piezas en status empaquetable o posterior.
+     *
+     * @param  Collection<int, ManufacturerOrderPiece>  $assignments
+     * @return array{array<int|string, float>, array<int|string, float>}
+     */
+    protected function completionTotalsFromPackableStatus(Collection $assignments, callable $groupKeyResolver): array
+    {
+        $totalQtyByGroup = [];
+        $completedQtyByGroup = [];
+
+        if ($assignments->isEmpty()) {
+            return [$totalQtyByGroup, $completedQtyByGroup];
+        }
+
+        $packableOrBeyondStatusIds = OrderPieceStatus::packableOrBeyondStatusIds();
+        $packableOrderPieceIds = $packableOrBeyondStatusIds === []
+            ? []
+            : OrderPiece::query()
+                ->whereIn('id', $assignments->pluck('order_piece_id')->unique()->values()->all())
+                ->whereIn('order_piece_status_id', $packableOrBeyondStatusIds)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+        foreach ($assignments as $assignment) {
+            $groupId = $groupKeyResolver($assignment);
+
+            if ($groupId === null) {
+                continue;
+            }
+
+            $assigned = (float) $assignment->quantity;
+
+            $totalQtyByGroup[$groupId] = ($totalQtyByGroup[$groupId] ?? 0) + $assigned;
+
+            if (in_array((int) $assignment->order_piece_id, $packableOrderPieceIds, true)) {
+                $completedQtyByGroup[$groupId] = ($completedQtyByGroup[$groupId] ?? 0) + $assigned;
+            }
+        }
+
+        return [$totalQtyByGroup, $completedQtyByGroup];
     }
 
     /** @return array{percent: float, bar_class: string, track_class: string, text_class: string}> */

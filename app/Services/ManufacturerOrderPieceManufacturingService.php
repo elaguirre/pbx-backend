@@ -6,6 +6,7 @@ use App\Enums\ManufacturingFollowUpResult;
 use App\Enums\ManufacturerOrderPieceStatus;
 use App\Models\ManufacturingFollowUp;
 use App\Models\ManufacturerOrderPiece;
+use App\Models\OrderPiece;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -50,11 +51,24 @@ class ManufacturerOrderPieceManufacturingService
 
         $newStatus = $this->resolveStatus((float) $assignment->quantity, $finishedQuantity);
 
-        if ($assignment->status === $newStatus) {
+        if ($assignment->status !== $newStatus) {
+            $assignment->update(['status' => $newStatus]);
+        }
+
+        $this->syncOrderPieceStatusFromAssignment($assignment->refresh(), $newStatus);
+    }
+
+    protected function syncOrderPieceStatusFromAssignment(
+        ManufacturerOrderPiece $assignment,
+        ManufacturerOrderPieceStatus $status,
+    ): void {
+        if ($status !== ManufacturerOrderPieceStatus::Completed || ! $assignment->status_of_completed_pieces) {
             return;
         }
 
-        $assignment->update(['status' => $newStatus]);
+        OrderPiece::query()
+            ->whereKey($assignment->order_piece_id)
+            ->update(['order_piece_status_id' => $assignment->status_of_completed_pieces]);
     }
 
     public function appendManufacturingAttributes(mixed $resolved): mixed
@@ -82,6 +96,8 @@ class ManufacturerOrderPieceManufacturingService
                     ->update(['status' => $newStatus->value]);
                 $row->setAttribute('status', $newStatus);
             }
+
+            $this->syncOrderPieceStatusFromAssignment($row, $newStatus);
 
             return $row;
         });
